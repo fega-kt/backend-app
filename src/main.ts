@@ -67,7 +67,15 @@ export async function bootstrap(): Promise<NestExpressApplication> {
       transform: true,
       dismissDefaultMessages: true,
       forbidNonWhitelisted: true,
-      exceptionFactory: (errors) => new UnprocessableEntityException(errors),
+      exceptionFactory: (errors) => {
+        console.error('Validation failed:', errors);
+
+        const messages = errors.flatMap((error) =>
+          error.constraints ? Object.values(error.constraints) : [],
+        );
+
+        return new UnprocessableEntityException(messages.join(', '));
+      },
     }),
   );
 
