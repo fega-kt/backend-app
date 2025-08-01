@@ -12,6 +12,7 @@ import type { NestExpressApplication } from '@nestjs/platform-express';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import compression from 'compression';
 import helmet from 'helmet';
+import _ from 'lodash';
 import morgan from 'morgan';
 import { initializeTransactionalContext } from 'typeorm-transactional';
 
@@ -71,7 +72,7 @@ export async function bootstrap(): Promise<NestExpressApplication> {
         console.error('Validation failed:', errors);
 
         const messages = errors.flatMap((error) =>
-          error.constraints ? Object.values(error.constraints) : [],
+          error.constraints ? _.compact(Object.values(error.constraints)) : [],
         );
 
         return new UnprocessableEntityException(messages.join(', '));
