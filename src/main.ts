@@ -19,6 +19,7 @@ import { initializeTransactionalContext } from 'typeorm-transactional';
 import { AppModule } from './app.module.ts';
 import { HttpExceptionFilter } from './filters/bad-request.filter.ts';
 import { QueryFailedFilter } from './filters/query-failed.filter.ts';
+import { TransformInterceptor } from './interceptors/transform.interceptor.service.ts';
 import { TranslationInterceptor } from './interceptors/translation-interceptor.service.ts';
 import { setupSwagger } from './setup-swagger.ts';
 import { ApiConfigService } from './shared/services/api-config.service.ts';
@@ -60,6 +61,7 @@ export async function bootstrap(): Promise<NestExpressApplication> {
       app.select(SharedModule).get(TranslationService),
     ),
   );
+  app.useGlobalInterceptors(new TransformInterceptor());
 
   app.useGlobalPipes(
     new ValidationPipe({

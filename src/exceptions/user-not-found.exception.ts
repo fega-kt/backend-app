@@ -1,7 +1,7 @@
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 
-export class UserNotFoundException extends NotFoundException {
+export class UserNotFoundException extends BadRequestException {
   constructor(error?: string) {
-    super('error.userNotFound', error);
+    super('Incorrect password account', error);
   }
 }
