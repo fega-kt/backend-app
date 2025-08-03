@@ -14,8 +14,8 @@ import {
   IsNumber,
   IsPositive,
   IsString,
-  IsUrl,
   IsUUID,
+  IsUrl,
   Matches,
   Max,
   MaxLength,
@@ -152,10 +152,20 @@ export function StringField(
 
   const minLength = options.minLength ?? 1;
 
-  decorators.push(MinLength(minLength, { each: options.each }));
+  decorators.push(
+    MinLength(minLength, {
+      each: options.each,
+      message: `Minimum length is ${minLength}`,
+    }),
+  );
 
   if (options.maxLength) {
-    decorators.push(MaxLength(options.maxLength, { each: options.each }));
+    decorators.push(
+      MaxLength(options.maxLength, {
+        each: options.each,
+        message: `Maximum length is ${options.maxLength}`,
+      }),
+    );
   }
 
   if (options.toLowerCase) {
@@ -203,7 +213,10 @@ export function PasswordField(
   options: Omit<ApiPropertyOptions, 'type' | 'minLength'> &
     IStringFieldOptions = {},
 ): PropertyDecorator {
-  const decorators = [StringField({ ...options, minLength: 6 }), IsPassword()];
+  const decorators = [
+    StringField({ ...options, minLength: 6 }),
+    IsPassword({ message: 'Invalid password' }),
+  ];
 
   if (options.nullable) {
     decorators.push(IsNullable());
@@ -423,7 +436,7 @@ export function EmailField(
   options: Omit<ApiPropertyOptions, 'type'> & IStringFieldOptions = {},
 ): PropertyDecorator {
   const decorators = [
-    IsEmail(),
+    IsEmail(undefined, { message: 'Email is not valid' }),
     StringField({ toLowerCase: true, ...options }),
   ];
 
