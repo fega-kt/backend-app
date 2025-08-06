@@ -1,4 +1,7 @@
-import { ClassField } from '../../../decorators/field.decorators.ts';
+import {
+  ClassField,
+  StringField,
+} from '../../../decorators/field.decorators.ts';
 import { UserDto } from '../../user/dtos/user.dto.ts';
 import { TokenPayloadDto } from './token-payload.dto.ts';
 
@@ -6,11 +9,15 @@ export class LoginPayloadDto {
   @ClassField(() => UserDto)
   user: UserDto;
 
-  @ClassField(() => TokenPayloadDto)
-  accessToken: TokenPayloadDto;
+  @StringField()
+  accessToken: string;
+
+  @StringField()
+  refreshToken: string;
 
   constructor(user: UserDto, token: TokenPayloadDto) {
     this.user = user;
-    this.accessToken = token;
+    this.accessToken = token.accessToken;
+    this.refreshToken = token.refreshToken;
   }
 }
