@@ -6,7 +6,6 @@ import {
   HttpStatus,
   Post,
   UploadedFile,
-  Version,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
@@ -69,7 +68,6 @@ export class AuthController {
     });
   }
 
-  @Version('1')
   @Get('me')
   @HttpCode(HttpStatus.OK)
   @Auth([RoleType.USER, RoleType.ADMIN])
