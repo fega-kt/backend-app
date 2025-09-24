@@ -24,4 +24,12 @@ export class HealthCheckerController {
       () => this.serviceIndicator.isHealthy('search-service-health'),
     ]);
   }
+
+  @Get('/database')
+  @HealthCheck()
+  async healthCheck(): Promise<HealthCheckResult> {
+    return this.healthCheckService.check([
+      () => this.ormIndicator.pingCheck('database', { timeout: 3500 }),
+    ]);
+  }
 }
