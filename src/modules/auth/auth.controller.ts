@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   Get,
   HttpCode,
   HttpStatus,
@@ -20,6 +21,7 @@ import { UserEntity } from '../user/user.entity.ts';
 import { UserService } from '../user/user.service.ts';
 import { AuthService } from './auth.service.ts';
 import { LoginPayloadDto } from './dto/login-payload.dto.ts';
+import type { RefreshTokenDto } from './dto/refresh-token.dto.ts';
 import { UserLoginDto } from './dto/user-login.dto.ts';
 import { UserRegisterDto } from './dto/user-register.dto.ts';
 
@@ -74,5 +76,29 @@ export class AuthController {
   @ApiOkResponse({ type: UserDto, description: 'current user info' })
   getCurrentUser(@AuthUser() user: UserEntity): UserDto {
     return user.toDto();
+  }
+
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: LoginPayloadDto, description: 'Refresh access token' })
+  async refreshToken(
+    @Body() { refreshToken }: RefreshTokenDto,
+  ): Promise<LoginPayloadDto> {
+    const payload = await this.authService.validateRefreshToken(refreshToken);
+    const userEntity = await this.userService.findOne({
+      id: payload.userId as never,
+      role: payload.role,
+    });
+
+    if (!userEntity) {
+      throw new ForbiddenException('Access denied');
+    }
+
+    const token = await this.authService.createAccessToken({
+      userId: userEntity.id,
+      role: userEntity.role,
+    });
+
+    return new LoginPayloadDto(userEntity.toDto(), token);
   }
 }
