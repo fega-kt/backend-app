@@ -43,7 +43,7 @@ export class UserController {
   }
 
   @Get()
-  @Auth([RoleType.USER])
+  @Auth([RoleType.ADMIN])
   @HttpCode(HttpStatus.OK)
   @ApiPageResponse({
     description: 'Get users list',
