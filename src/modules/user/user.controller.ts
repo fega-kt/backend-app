@@ -91,8 +91,6 @@ export class UserController {
       file,
     );
 
-    return updatedUser.toDto({
-      isActive: true,
-    });
+    return updatedUser;
   }
 }

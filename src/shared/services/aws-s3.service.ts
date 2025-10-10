@@ -52,11 +52,11 @@ export class AwsS3Service {
     this.logger.log('--------------- AWS S3 Config ----------------');
   }
 
-  async uploadImage(file: IFile): Promise<string> {
+  async uploadImage(file: IFile, path: string): Promise<string> {
     const fileName = this.generatorService.fileName(
       mime.extension(file.mimetype) as string,
     );
-    const key = `images/${fileName}`;
+    const key = `${path}/${fileName}`;
 
     await this.s3.send(
       new PutObjectCommand({

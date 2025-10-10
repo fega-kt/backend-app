@@ -7,12 +7,14 @@ import { Repository } from 'typeorm';
 import { Transactional } from 'typeorm-transactional';
 
 import type { PageDto } from '../../common/dto/page.dto.ts';
+import { FolderAWS } from '../../constants/folder.ts';
 import { FileNotImageException } from '../../exceptions/file-not-image.exception.ts';
 import { UserNotFoundException } from '../../exceptions/user-not-found.exception.ts';
 import type { IFile } from '../../interfaces/IFile.ts';
 import { AwsS3Service } from '../../shared/services/aws-s3.service.ts';
 import { ValidatorService } from '../../shared/services/validator.service.ts';
 import type { Reference } from '../../types.ts';
+import { urlJoin } from '../../utils/url-join.ts';
 import { UserRegisterDto } from '../auth/dto/user-register.dto.ts';
 import { CreateSettingsCommand } from './commands/create-settings.command.ts';
 import { CreateSettingsDto } from './dtos/create-settings.dto.ts';
@@ -73,7 +75,10 @@ export class UserService {
     }
 
     if (file) {
-      user.avatar = await this.awsS3Service.uploadImage(file);
+      user.avatar = await this.awsS3Service.uploadImage(
+        file,
+        urlJoin(FolderAWS.AVATAR, user.id),
+      );
     }
 
     await this.userRepository.save(user);
@@ -126,7 +131,7 @@ export class UserService {
     id: string,
     updateUserDto: UpdateUserDto,
     file?: Reference<IFile>,
-  ): Promise<UserEntity> {
+  ): Promise<UserDto> {
     const user = await this.findOne({ id: id as never });
 
     if (!user) {
@@ -143,12 +148,15 @@ export class UserService {
 
     // Upload ảnh nếu có
     if (file) {
-      user.avatar = await this.awsS3Service.uploadImage(file);
+      user.avatar = await this.awsS3Service.uploadImage(
+        file,
+        urlJoin(FolderAWS.AVATAR, user.id),
+      );
     }
 
     await this.userRepository.save(user);
 
-    return user;
+    return this.getAvatarPresignedUrl(user);
   }
 
   async getAvatarPresignedUrl(user: UserEntity): Promise<UserDto> {
