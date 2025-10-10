@@ -93,3 +93,12 @@ db-data
 .vuepress/.cache
 # VuePress default build output directory
 .vuepress/dist
+
+
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+
+.yarn/install-state.gz
