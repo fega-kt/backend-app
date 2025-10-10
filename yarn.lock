@@ -7475,6 +7475,7 @@ __metadata:
     "@vuepress/theme-default": "npm:2.0.0-rc.68"
     awesome-nestjs-schematics: "npm:^10.1.1"
     bcrypt: "npm:^5.1.1"
+    child_process: "npm:^1.0.2"
     class-transformer: "npm:~0.5.1"
     class-validator: "npm:~0.14.2"
     compression: "npm:^1.8.0"
@@ -8160,6 +8161,13 @@ __metadata:
     undici: "npm:^6.19.5"
     whatwg-mimetype: "npm:^4.0.0"
   checksum: 10c0/d0e16925d9c36c879edfaef1c0244c866375a4c7b8d6ccd7ae0ad42da7d26263ea1a3c17b9a1aa5965918deeff2d40ac2e7223824f8e6eca972df3b81316a09f
+  languageName: node
+  linkType: hard
+
+"child_process@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "child_process@npm:1.0.2"
+  checksum: 10c0/6e45dff224c704dc5c5edc14532e6c0c5c23a7c5f823574349246082d94a29780a68a46155d8a6989ffa986cb12ed0b01fbfc6c713b6655959fabb6b8cd52e4a
   languageName: node
   linkType: hard
 
