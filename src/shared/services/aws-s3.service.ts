@@ -1,4 +1,10 @@
-import { S3 } from '@aws-sdk/client-s3';
+import {
+  GetObjectCommand,
+  HeadBucketCommand,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Injectable, Logger } from '@nestjs/common';
 import mime from 'mime-types';
 
@@ -8,7 +14,7 @@ import { GeneratorService } from './generator.service.ts';
 
 @Injectable()
 export class AwsS3Service {
-  private readonly s3: S3;
+  private readonly s3: S3Client;
 
   private logger = new Logger('AwsS3Service');
 
@@ -18,7 +24,7 @@ export class AwsS3Service {
   ) {
     const config = configService.awsS3Config;
 
-    this.s3 = new S3({
+    this.s3 = new S3Client({
       apiVersion: config.bucketApiVersion,
       region: config.bucketRegion,
       credentials: {
@@ -32,9 +38,11 @@ export class AwsS3Service {
     this.logger.log('--------------- AWS S3 Config ----------------');
 
     try {
-      await this.s3.headBucket({
-        Bucket: this.configService.awsS3Config.bucketName,
-      });
+      await this.s3.send(
+        new HeadBucketCommand({
+          Bucket: this.configService.awsS3Config.bucketName,
+        }),
+      );
 
       this.logger.log('✅ S3 bucket is accessible!');
     } catch (error) {
@@ -49,13 +57,28 @@ export class AwsS3Service {
       mime.extension(file.mimetype) as string,
     );
     const key = `images/${fileName}`;
-    await this.s3.putObject({
+
+    await this.s3.send(
+      new PutObjectCommand({
+        Bucket: this.configService.awsS3Config.bucketName,
+        Body: file.buffer,
+        Key: key,
+        // ACL: 'public-read', // nếu muốn public
+        ContentType: file.mimetype, // nên thêm để S3 biết kiểu file
+      }),
+    );
+
+    return key;
+  }
+
+  async getPresignedUrl(key: string): Promise<string> {
+    const command = new GetObjectCommand({
       Bucket: this.configService.awsS3Config.bucketName,
-      Body: file.buffer,
-      ACL: 'public-read',
       Key: key,
     });
 
-    return key;
+    const url = await getSignedUrl(this.s3, command, { expiresIn: 3600 });
+
+    return url;
   }
 }
