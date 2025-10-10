@@ -1,20 +1,28 @@
 import {
+  Body,
   Controller,
   Get,
   HttpCode,
   HttpStatus,
+  Param,
+  Put,
   Query,
+  UploadedFile,
   ValidationPipe,
 } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
+import type { IFile } from 'interfaces/IFile.ts';
+import type { Reference } from 'types.ts';
 
 import { PageDto } from '../../common/dto/page.dto.ts';
 import { RoleType } from '../../constants/role-type.ts';
 import { ApiPageResponse } from '../../decorators/api-page-response.decorator.ts';
 import { AuthUser } from '../../decorators/auth-user.decorator.ts';
 import { Auth, UUIDParam } from '../../decorators/http.decorators.ts';
+import { ApiFile } from '../../decorators/swagger.schema.ts';
 import { UseLanguageInterceptor } from '../../interceptors/language-interceptor.service.ts';
 import { TranslationService } from '../../shared/services/translation.service.ts';
+import { UpdateUserDto } from './dtos/update-user.dto.ts';
 import { UserDto } from './dtos/user.dto.ts';
 import { UsersPageOptionsDto } from './dtos/users-page-options.dto.ts';
 import { UserEntity } from './user.entity.ts';
@@ -66,5 +74,25 @@ export class UserController {
   })
   getUser(@UUIDParam('id') userId: Uuid): Promise<UserDto> {
     return this.userService.getUser(userId);
+  }
+
+  @Put(':id')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: UserDto, description: 'Successfully Updated' })
+  @ApiFile({ name: 'avatar' })
+  async updateUser(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+    @UploadedFile() file?: Reference<IFile>,
+  ): Promise<UserDto> {
+    const updatedUser = await this.userService.updateUser(
+      id,
+      updateUserDto,
+      file,
+    );
+
+    return updatedUser.toDto({
+      isActive: true,
+    });
   }
 }

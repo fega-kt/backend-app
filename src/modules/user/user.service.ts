@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass } from 'class-transformer';
@@ -16,6 +16,7 @@ import type { Reference } from '../../types.ts';
 import { UserRegisterDto } from '../auth/dto/user-register.dto.ts';
 import { CreateSettingsCommand } from './commands/create-settings.command.ts';
 import { CreateSettingsDto } from './dtos/create-settings.dto.ts';
+import type { UpdateUserDto } from './dtos/update-user.dto.ts';
 import type { UserDto } from './dtos/user.dto.ts';
 import type { UsersPageOptionsDto } from './dtos/users-page-options.dto.ts';
 import { UserEntity } from './user.entity.ts';
@@ -118,5 +119,43 @@ export class UserService {
     return this.commandBus.execute<CreateSettingsCommand, UserSettingsEntity>(
       new CreateSettingsCommand(userId, createSettingsDto),
     );
+  }
+
+  @Transactional()
+  async updateUser(
+    id: string,
+    updateUserDto: UpdateUserDto,
+    file?: Reference<IFile>,
+  ): Promise<UserEntity> {
+    const user = await this.findOne({ id: id as never });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Gán các trường từ DTO
+    Object.assign(user, updateUserDto);
+
+    // Validate file
+    if (file && !this.validatorService.isImage(file.mimetype)) {
+      throw new FileNotImageException();
+    }
+
+    // Upload ảnh nếu có
+    if (file) {
+      user.avatar = await this.awsS3Service.uploadImage(file);
+    }
+
+    await this.userRepository.save(user);
+
+    return user;
+  }
+
+  async getAvatarPresignedUrl(user: UserEntity): Promise<UserDto> {
+    if (user.avatar) {
+      user.avatar = await this.awsS3Service.getPresignedUrl(user.avatar);
+    }
+
+    return user.toDto();
   }
 }
