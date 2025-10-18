@@ -16,6 +16,7 @@ import _ from 'lodash';
 import morgan from 'morgan';
 import { initializeTransactionalContext } from 'typeorm-transactional';
 
+import { RequestContextInterceptor } from 'context/request-context.interceptor.ts';
 import { AppModule } from './app.module.ts';
 import { HttpExceptionFilter } from './filters/bad-request.filter.ts';
 import { QueryFailedFilter } from './filters/query-failed.filter.ts';
@@ -62,6 +63,8 @@ export async function bootstrap(): Promise<NestExpressApplication> {
     ),
   );
   app.useGlobalInterceptors(new TransformInterceptor());
+
+  app.useGlobalInterceptors(new RequestContextInterceptor());
 
   app.useGlobalPipes(
     new ValidationPipe({

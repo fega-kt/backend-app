@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 import { validateHash } from '../../common/utils.ts';
@@ -74,7 +78,11 @@ export class AuthService {
       throw new UserNotFoundException();
     }
 
-    return user!;
+    if (!user?.isActive) {
+      throw new ForbiddenException('User account is disabled');
+    }
+
+    return user;
   }
 
   async validateRefreshToken(

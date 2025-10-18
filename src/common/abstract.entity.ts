@@ -20,7 +20,9 @@ import type {
  * otherwise just delete and use your own entity.
  */
 export abstract class AbstractEntity<
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
   DTO extends AbstractDto = AbstractDto,
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
   O = never,
 > {
   @PrimaryGeneratedColumn('uuid')
@@ -36,9 +38,22 @@ export abstract class AbstractEntity<
   })
   updatedAt!: Date;
 
+  @Column({
+    type: 'boolean',
+    default: false,
+  })
+  deleted?: boolean;
+
+  @Column({ type: 'uuid' })
+  createdById!: string;
+
+  @Column({ type: 'uuid' })
+  updatedById!: string;
+
   translations?: AbstractTranslationEntity[];
 
   toDto(options?: O): DTO {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
     const dtoClass = Object.getPrototypeOf(this).dtoClass;
 
     if (!dtoClass) {
@@ -47,6 +62,7 @@ export abstract class AbstractEntity<
       );
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
     return new dtoClass(this, options);
   }
 }

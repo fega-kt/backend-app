@@ -15,7 +15,8 @@
       "dts": true
     },
     "target": "esnext",
-    "baseUrl": "./",
+
+    "baseUrl": "./src",
     "experimental": {
       "plugins": [
         [

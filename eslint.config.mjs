@@ -3,12 +3,12 @@
 import eslint from '@eslint/js';
 import stylisticPlugin from '@stylistic/eslint-plugin';
 import canonicalPlugin from 'eslint-plugin-canonical';
+import importPlugin from 'eslint-plugin-import';
 import nPlugin from 'eslint-plugin-n';
 import prettierPlugin from 'eslint-plugin-prettier/recommended';
-import sonarjsPlugin from 'eslint-plugin-sonarjs';
 import promisePlugin from 'eslint-plugin-promise';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
-import importPlugin from 'eslint-plugin-import';
+import sonarjsPlugin from 'eslint-plugin-sonarjs';
 import unicornPlugin from 'eslint-plugin-unicorn';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
@@ -22,7 +22,7 @@ export default tseslint.config(
       '@stylistic': stylisticPlugin,
     },
     rules: {
-      'simple-import-sort/imports': 'error',
+      'simple-import-sort/imports': 'off',
       'simple-import-sort/exports': 'error',
       '@stylistic/member-delimiter-style': [
         'error',
@@ -152,7 +152,7 @@ export default tseslint.config(
       ],
 
       '@typescript-eslint/no-restricted-types': 'error',
-      '@typescript-eslint/no-empty-object-type': 'error',
+      '@typescript-eslint/no-empty-object-type': 'off',
       '@typescript-eslint/no-unsafe-function-type': 'error',
       '@typescript-eslint/no-wrapper-object-types': 'error',
 

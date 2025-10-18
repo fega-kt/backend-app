@@ -1,8 +1,16 @@
-import { Column, Entity, OneToMany, OneToOne, VirtualColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+  VirtualColumn,
+} from 'typeorm';
 
 import { AbstractEntity } from '../../common/abstract.entity.ts';
 import { RoleType } from '../../constants/role-type.ts';
 import { UseDto } from '../../decorators/use-dto.decorator.ts';
+import { DepartmentEntity } from '../departments/department.entity.ts';
 import { PostEntity } from '../post/post.entity.ts';
 import type { UserDtoOptions } from './dtos/user.dto.ts';
 import { UserDto } from './dtos/user.dto.ts';
@@ -43,4 +51,16 @@ export class UserEntity extends AbstractEntity<UserDto, UserDtoOptions> {
 
   @OneToMany(() => PostEntity, (postEntity) => postEntity.user)
   posts?: PostEntity[];
+
+  @ManyToOne(() => DepartmentEntity, (department) => department.users, {
+    nullable: true, // nếu user có thể chưa có phòng ban
+    onDelete: 'SET NULL', // khi department bị xóa thì set NULL
+  })
+  department?: DepartmentEntity;
+
+  @Column({
+    type: 'boolean',
+    default: false,
+  })
+  isActive?: boolean;
 }

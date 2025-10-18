@@ -21,8 +21,8 @@ import { CreateSettingsDto } from './dtos/create-settings.dto.ts';
 import type { UpdateUserDto } from './dtos/update-user.dto.ts';
 import type { UserDto } from './dtos/user.dto.ts';
 import type { UsersPageOptionsDto } from './dtos/users-page-options.dto.ts';
-import { UserEntity } from './user.entity.ts';
 import type { UserSettingsEntity } from './user-settings.entity.ts';
+import { UserEntity } from './user.entity.ts';
 
 @Injectable()
 export class UserService {
@@ -100,6 +100,7 @@ export class UserService {
     const queryBuilder = this.userRepository.createQueryBuilder('user');
     const [items, pageMetaDto] = await queryBuilder.paginate(pageOptionsDto);
 
+    // eslint-disable-next-line sonarjs/argument-type
     return items.toPageDto(pageMetaDto);
   }
 

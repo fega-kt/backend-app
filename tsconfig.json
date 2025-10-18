@@ -34,7 +34,9 @@
     "noUncheckedIndexedAccess": true,
     "outDir": "./dist",
     "baseUrl": "./src",
+    "rootDir": "./src",
     "incremental": true,
+    "tsBuildInfoFile": "./dist/tsconfig.build.tsbuildinfo",
     "strict": true,
     "strictNullChecks": true
   },
