@@ -1,0 +1,3 @@
+yarn migration:generate ./src/database/migrations/migrations-table
+
+

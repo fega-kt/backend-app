@@ -1,6 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
+import { UserDisableException } from 'exceptions/user-not-found.exception copy.ts';
 import { validateHash } from '../../common/utils.ts';
 import type { RoleType } from '../../constants/role-type.ts';
 import { TokenType } from '../../constants/token-type.ts';
@@ -74,7 +75,11 @@ export class AuthService {
       throw new UserNotFoundException();
     }
 
-    return user!;
+    if (!user?.isActive) {
+      throw new UserDisableException();
+    }
+
+    return user;
   }
 
   async validateRefreshToken(

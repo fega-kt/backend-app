@@ -9,7 +9,6 @@ import {
   UploadedFile,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import type { AwsS3Service } from 'shared/services/aws-s3.service.ts';
 
 import { RoleType } from '../../constants/role-type.ts';
 import { AuthUser } from '../../decorators/auth-user.decorator.ts';
@@ -67,7 +66,7 @@ export class AuthController {
     );
 
     return createdUser.toDto({
-      isActive: true,
+      isActive: false,
     });
   }
 
