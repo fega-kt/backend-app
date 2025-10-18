@@ -1,5 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import type { ExecutionContext } from '@nestjs/common';
-import { createParamDecorator } from '@nestjs/common';
+import { createParamDecorator, ForbiddenException } from '@nestjs/common';
+import type { UserEntity } from '../modules/user/user.entity';
 
 export function AuthUser() {
   return createParamDecorator((_data: unknown, context: ExecutionContext) => {
@@ -11,6 +14,10 @@ export function AuthUser() {
       return;
     }
 
-    return user;
+    if (!user.isActive) {
+      throw new ForbiddenException('User account is disabled');
+    }
+
+    return user as UserEntity;
   })();
 }
