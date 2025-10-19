@@ -71,7 +71,11 @@ export class AwsS3Service {
     return key;
   }
 
-  async getPresignedUrl(key: string): Promise<string> {
+  async getPresignedUrl(key?: string | null): Promise<string> {
+    if (!key?.trim()) {
+      return '';
+    }
+
     const command = new GetObjectCommand({
       Bucket: this.configService.awsS3Config.bucketName,
       Key: key,

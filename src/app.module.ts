@@ -26,6 +26,7 @@ import { SharedModule } from './shared/shared.module.ts';
   imports: [
     AuthModule,
     UserModule,
+    DepartmentModule,
     PostModule,
     ClsModule.forRoot({
       global: true,
@@ -77,7 +78,6 @@ import { SharedModule } from './shared/shared.module.ts';
       inject: [ApiConfigService],
     }),
     HealthCheckerModule,
-    DepartmentModule,
   ],
   providers: [],
 })
