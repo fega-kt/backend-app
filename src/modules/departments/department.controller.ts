@@ -10,20 +10,21 @@ import {
   Query,
 } from '@nestjs/common';
 
+import { RoleType } from 'constants/role-type.ts';
 import type { PageDto } from '../../common/dto/page.dto';
-import { CreateDepartmentDto } from './dto/create-department.dto.ts';
-import type { DepartmentDto } from './dto/department.dto.ts';
-import { DepartmentPageOptionsDto } from './dto/department-page-options.dto.ts';
-import { UpdateDepartmentDto } from './dto/update-department.dto.ts';
-import { DepartmentService } from './department.service.ts';
 import { Auth, UUIDParam } from '../../decorators/http.decorators.ts';
+import { DepartmentService } from './department.service.ts';
+import { CreateDepartmentDto } from './dto/create-department.dto.ts';
+import { DepartmentPageOptionsDto } from './dto/department-page-options.dto.ts';
+import type { DepartmentDto } from './dto/department.dto.ts';
+import { UpdateDepartmentDto } from './dto/update-department.dto.ts';
 
 @Controller('departments')
 export class DepartmentController {
   constructor(private departmentService: DepartmentService) {}
 
   @Post()
-  @Auth([])
+  @Auth([RoleType.ADMIN])
   @HttpCode(HttpStatus.CREATED)
   async createDepartment(@Body() createDepartmentDto: CreateDepartmentDto) {
     const entity =
@@ -33,7 +34,7 @@ export class DepartmentController {
   }
 
   @Get()
-  @Auth([])
+  @Auth([RoleType.ADMIN])
   @HttpCode(HttpStatus.OK)
   getDepartments(
     @Query() departmentPageOptionsDto: DepartmentPageOptionsDto,
@@ -52,6 +53,7 @@ export class DepartmentController {
 
   @Put(':id')
   @HttpCode(HttpStatus.ACCEPTED)
+  @Auth([RoleType.ADMIN])
   updateDepartment(
     @UUIDParam('id') id: Uuid,
     @Body() updateDepartmentDto: UpdateDepartmentDto,
@@ -60,6 +62,7 @@ export class DepartmentController {
   }
 
   @Delete(':id')
+  @Auth([RoleType.ADMIN])
   @HttpCode(HttpStatus.ACCEPTED)
   async deleteDepartment(@UUIDParam('id') id: Uuid): Promise<void> {
     await this.departmentService.deleteDepartment(id);

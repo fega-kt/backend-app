@@ -1,3 +1,4 @@
 yarn migration:generate ./src/database/migrations/migrations-table
+yarn migration:generate ./src/database/migrations/update-department
 
 

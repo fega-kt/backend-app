@@ -5,6 +5,7 @@ import type { Repository } from 'typeorm';
 import { Transactional } from 'typeorm-transactional';
 
 import type { PageDto } from '../../common/dto/page.dto.ts';
+import { AwsS3Service } from '../../shared/services/aws-s3.service.ts';
 import { CreateDepartmentCommand } from './commands/create-department.command.ts';
 import { DepartmentEntity } from './department.entity.ts';
 import { CreateDepartmentDto } from './dto/create-department.dto.ts';
@@ -18,6 +19,7 @@ export class DepartmentService {
   constructor(
     @InjectRepository(DepartmentEntity)
     private departmentRepository: Repository<DepartmentEntity>,
+    private awsS3Service: AwsS3Service,
     private commandBus: CommandBus,
   ) {}
 
@@ -34,14 +36,45 @@ export class DepartmentService {
     departmentPageOptionsDto: DepartmentPageOptionsDto,
   ): Promise<PageDto<DepartmentDto>> {
     const queryBuilder = this.departmentRepository
-      .createQueryBuilder('departments')
-      .leftJoinAndSelect('departments.translations', 'departmentsTranslation');
+      .createQueryBuilder('department')
+      .leftJoin('department.deputy', 'deputy')
+      .leftJoin('department.manager', 'manager')
+
+      .addSelect([
+        'deputy.id',
+        'deputy.fullName',
+        'deputy.avatar',
+        'manager.id',
+        'manager.fullName',
+        'manager.avatar',
+      ])
+      .where('department.deleted != :deleted', { deleted: true })
+      .orderBy('department.updatedAt', 'DESC');
+
     const [items, pageMetaDto] = await queryBuilder.paginate(
       departmentPageOptionsDto,
     );
+    const data = await Promise.all(
+      items.map(async (item) => {
+        const [managerAvatar, deputyAvatar] = await Promise.all([
+          this.awsS3Service.getPresignedUrl(item.manager?.avatar),
+          this.awsS3Service.getPresignedUrl(item.deputy?.avatar),
+        ]);
+
+        if (item.manager) {
+          item.manager.avatar = managerAvatar;
+        }
+
+        if (item.deputy) {
+          item.deputy.avatar = deputyAvatar;
+        }
+
+        return item;
+      }),
+    );
 
     // eslint-disable-next-line sonarjs/argument-type
-    return items.toPageDto(pageMetaDto);
+    return data.toPageDto(pageMetaDto);
   }
 
   async getDepartment(id: Uuid): Promise<DepartmentEntity> {

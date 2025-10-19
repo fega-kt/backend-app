@@ -10,7 +10,8 @@ const handlers = [CreateDepartmentHandler];
 
 @Module({
   imports: [TypeOrmModule.forFeature([DepartmentEntity])],
-  providers: [DepartmentService, ...handlers],
   controllers: [DepartmentController],
+  exports: [DepartmentService],
+  providers: [DepartmentService, ...handlers],
 })
 export class DepartmentModule {}

@@ -7,7 +7,7 @@ import {
   PhoneFieldOptional,
   StringFieldOptional,
 } from '../../../decorators/field.decorators.ts';
-import type { DepartmentDto } from '../../../modules/departments/dto/department.dto.ts';
+import type { DepartmentEntity } from '../../../modules/departments/department.entity.ts';
 import type { UserEntity } from '../user.entity.ts';
 
 export type UserDtoOptions = Partial<{ isActive: boolean }>;
@@ -37,7 +37,7 @@ export class UserDto extends AbstractDto {
   @BooleanFieldOptional()
   isActive?: boolean;
 
-  department?: DepartmentDto | null;
+  department?: DepartmentEntity | null;
 
   constructor(user: UserEntity, options?: UserDtoOptions) {
     super(user);
