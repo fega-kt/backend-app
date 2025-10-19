@@ -97,11 +97,28 @@ export class UserService {
   async getUsers(
     pageOptionsDto: UsersPageOptionsDto,
   ): Promise<PageDto<UserDto>> {
-    const queryBuilder = this.userRepository.createQueryBuilder('user');
+    const queryBuilder = this.userRepository
+      .createQueryBuilder('user')
+      .leftJoin('user.department', 'department')
+      .addSelect(['department.id', 'department.name', 'department.code'])
+      .where('user.deleted != :deleted', { deleted: true })
+      .orderBy('user.updatedAt', 'DESC');
+
     const [items, pageMetaDto] = await queryBuilder.paginate(pageOptionsDto);
+    const data = await Promise.all(
+      items.map(async (it) => {
+        const avatar = it.avatar
+          ? await this.awsS3Service.getPresignedUrl(it.avatar)
+          : '';
+
+        it.avatar = avatar;
+
+        return it;
+      }),
+    );
 
     // eslint-disable-next-line sonarjs/argument-type
-    return items.toPageDto(pageMetaDto);
+    return data.toPageDto(pageMetaDto);
   }
 
   async getUser(userId: Uuid): Promise<UserDto> {
