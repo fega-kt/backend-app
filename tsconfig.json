@@ -34,7 +34,6 @@
     "noUncheckedIndexedAccess": true,
     "outDir": "./dist",
     "baseUrl": "./src",
-    "rootDir": "./src",
     "incremental": true,
     "tsBuildInfoFile": "./dist/tsconfig.build.tsbuildinfo",
     "strict": true,
@@ -45,6 +44,6 @@
     "transpileOnly": true,
     "esm": true
   },
-  "include": ["src/**/*", "ormconfig.ts"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "**/*.spec.ts", "scripts/**/*.js"]
 }
