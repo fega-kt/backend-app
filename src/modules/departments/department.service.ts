@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import type { Repository } from 'typeorm';
+import { IsNull, type Repository } from 'typeorm';
 import { Transactional } from 'typeorm-transactional';
 
 import type { PageDto } from '../../common/dto/page.dto.ts';
@@ -24,9 +24,19 @@ export class DepartmentService {
   ) {}
 
   @Transactional()
-  createDepartment(
+  async createDepartment(
     createDepartmentDto: CreateDepartmentDto,
   ): Promise<DepartmentEntity> {
+    if (!createDepartmentDto.parentId) {
+      const existingRoot = await this.departmentRepository.findOneBy({
+        parent: IsNull(),
+      });
+
+      if (existingRoot) {
+        throw new Error('Chỉ được phép có một phòng ban gốc duy nhất');
+      }
+    }
+
     return this.commandBus.execute<CreateDepartmentCommand, DepartmentEntity>(
       new CreateDepartmentCommand(createDepartmentDto),
     );
@@ -80,15 +90,46 @@ export class DepartmentService {
   async getDepartment(id: Uuid): Promise<DepartmentEntity> {
     const queryBuilder = this.departmentRepository
       .createQueryBuilder('departments')
-      .where('departments.id = :id', { id });
+      .where('departments.id = :id', { id })
+      .leftJoin('departments.manager', 'manager')
+      .leftJoin('departments.deputy', 'deputy')
+      .addSelect([
+        'manager.id',
+        'manager.firstName',
+        'manager.lastName',
+        'manager.avatar',
+      ])
+      .addSelect([
+        'deputy.id',
+        'deputy.firstName',
+        'deputy.lastName',
+        'deputy.avatar',
+      ])
+      .addSelect('manager.fullName')
+      .addSelect('deputy.fullName');
 
-    const entity = await queryBuilder.getOne();
+    const department = await queryBuilder.getOne();
 
-    if (!entity) {
+    console.info('fullName::', department?.manager?.fullName);
+
+    if (!department) {
       throw new DepartmentNotFoundException();
     }
 
-    return entity;
+    const [managerAvatar, deputyAvatar] = await Promise.all([
+      this.awsS3Service.getPresignedUrl(department.manager?.avatar),
+      this.awsS3Service.getPresignedUrl(department.deputy?.avatar),
+    ]);
+
+    if (department.manager) {
+      department.manager.avatar = managerAvatar;
+    }
+
+    if (department.deputy) {
+      department.deputy.avatar = deputyAvatar;
+    }
+
+    return department;
   }
 
   async updateDepartment(

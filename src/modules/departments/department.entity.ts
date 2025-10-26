@@ -19,10 +19,10 @@ export class DepartmentEntity extends AbstractEntity<
   @Column({ type: 'varchar' })
   name!: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', unique: true })
   code!: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', unique: true })
   path!: string;
 
   @ManyToOne(() => DepartmentEntity, (department) => department.children, {
