@@ -6,6 +6,7 @@ import type { FindOptionsWhere } from 'typeorm';
 import { Repository } from 'typeorm';
 import { Transactional } from 'typeorm-transactional';
 
+import lodash from 'lodash';
 import type { PageDto } from '../../common/dto/page.dto.ts';
 import { FolderAWS } from '../../constants/folder.ts';
 import { FileNotImageException } from '../../exceptions/file-not-image.exception.ts';
@@ -112,6 +113,11 @@ export class UserService {
           : '';
 
         it.avatar = avatar;
+        lodash.set(
+          it,
+          'fullName',
+          lodash.compact([it.firstName, it.lastName]).join(' '),
+        );
 
         return it;
       }),

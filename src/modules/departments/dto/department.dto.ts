@@ -26,7 +26,8 @@ export class DepartmentDto extends AbstractDto {
   deputy?: UserEntity;
 
   constructor(department: DepartmentEntity, options?: IDepartmentDtoOptions) {
-    console.info(options);
+    console.info('options ::', options);
+
     super(department);
     this.name = department.name;
     this.code = department.code;

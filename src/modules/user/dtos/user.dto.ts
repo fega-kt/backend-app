@@ -22,6 +22,9 @@ export class UserDto extends AbstractDto {
   @StringFieldOptional({ nullable: true })
   username!: string;
 
+  @StringFieldOptional({ nullable: true })
+  fullName!: string;
+
   @EnumFieldOptional(() => RoleType)
   role?: RoleType;
 
@@ -42,6 +45,7 @@ export class UserDto extends AbstractDto {
   constructor(user: UserEntity, options?: UserDtoOptions) {
     super(user);
     this.firstName = user.firstName;
+    this.fullName = user.fullName;
     this.lastName = user.lastName;
     this.role = user.role;
     this.email = user.email;
