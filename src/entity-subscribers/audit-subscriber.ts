@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import {
   type EntitySubscriberInterface,
   EventSubscriber,
@@ -26,6 +27,14 @@ export class AuditSubscriber
     const user = RequestContext.currentUser();
 
     // 🔹 Nếu là UserEntity → hash password
+
+    if (event.entity instanceof UserEntity) {
+      event.entity.fullName = _.compact([
+        event.entity.firstName,
+        event.entity.lastName,
+      ]).join(' ');
+    }
+
     if (event.entity instanceof UserEntity && event.entity.password) {
       event.entity.password = generateHash(event.entity.password);
     }
@@ -49,6 +58,11 @@ export class AuditSubscriber
       if (entity.password && old && entity.password !== old.password) {
         entity.password = generateHash(entity.password);
       }
+
+      event.entity.fullName = _.compact([
+        event.entity.firstName,
+        event.entity.lastName,
+      ]).join(' ');
     }
 
     // 🔹 Audit fields

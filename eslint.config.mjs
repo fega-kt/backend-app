@@ -239,6 +239,8 @@ export default tseslint.config(
       '@typescript-eslint/unified-signatures': 'error',
       '@typescript-eslint/interface-name-prefix': 'off',
       '@typescript-eslint/no-non-null-assertion': 'off',
+      'unicorn/no-keyword-prefix': 'off',
+      'sonarjs/different-types-comparison': 'off',
       '@typescript-eslint/no-shadow': 'error',
       '@typescript-eslint/no-unused-expressions': ['error'],
       'no-await-in-loop': 'error',

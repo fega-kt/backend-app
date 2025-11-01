@@ -13,6 +13,7 @@ import {
 import { RoleType } from 'constants/role-type.ts';
 import type { PageDto } from '../../common/dto/page.dto';
 import { Auth, UUIDParam } from '../../decorators/http.decorators.ts';
+import type { DepartmentEntity } from './department.entity.ts';
 import { DepartmentService } from './department.service.ts';
 import { CreateDepartmentDto } from './dto/create-department.dto.ts';
 import { DepartmentPageOptionsDto } from './dto/department-page-options.dto.ts';
@@ -42,6 +43,13 @@ export class DepartmentController {
     return this.departmentService.getDepartments(departmentPageOptionsDto);
   }
 
+  @Get('tree')
+  @Auth()
+  @HttpCode(HttpStatus.OK)
+  getDepartmentsForBuildTree(): Promise<DepartmentEntity[]> {
+    return this.departmentService.getDepartmentsForTree();
+  }
+
   @Get(':id')
   @Auth([])
   @HttpCode(HttpStatus.OK)
@@ -52,7 +60,7 @@ export class DepartmentController {
   }
 
   @Put(':id')
-  @HttpCode(HttpStatus.ACCEPTED)
+  @HttpCode(HttpStatus.OK)
   @Auth([RoleType.ADMIN])
   updateDepartment(
     @UUIDParam('id') id: Uuid,
