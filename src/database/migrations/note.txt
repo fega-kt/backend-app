@@ -1,7 +1,7 @@
 yarn migration:generate ./src/database/migrations/migrations-table
 yarn migration:generate ./src/database/migrations/update-department
 yarn migration:generate ./src/database/migrations/department-code -> bổ dung uniq cho code và path
+yarn migration:generate ./src/database/migrations/user-fullname -> lưu luôn fullName
 
 
-
-migration:run
+yarn migration:run

@@ -1,11 +1,4 @@
-import {
-  Column,
-  Entity,
-  ManyToOne,
-  OneToMany,
-  OneToOne,
-  VirtualColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 
 import { AbstractEntity } from '../../common/abstract.entity.ts';
 import { RoleType } from '../../constants/role-type.ts';
@@ -40,11 +33,8 @@ export class UserEntity extends AbstractEntity<UserDto, UserDtoOptions> {
   @Column({ nullable: true, type: 'varchar' })
   avatar!: string | null;
 
-  @VirtualColumn({
-    query: (alias) =>
-      `SELECT CONCAT(${alias}.first_name, ' ', ${alias}.last_name)`,
-  })
-  fullName!: string;
+  @Column({ nullable: true, type: 'varchar' })
+  fullName!: string | null;
 
   @OneToOne(() => UserSettingsEntity, (userSettings) => userSettings.user)
   settings?: UserSettingsEntity;

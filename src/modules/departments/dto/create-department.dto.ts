@@ -1,41 +1,24 @@
-import { CreateTranslationDto } from '../../../common/dto/create-translation.dto.ts';
-import { TranslationsField } from '../../../decorators/field.decorators.ts';
-
 import { IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class CreateDepartmentDto {
-  // 🔹 Tiêu đề đa ngôn ngữ
-  @TranslationsField({ type: CreateTranslationDto })
-  title!: CreateTranslationDto[];
-
-  // 🔹 Mô tả đa ngôn ngữ
-  @TranslationsField({ type: CreateTranslationDto })
-  description!: CreateTranslationDto[];
-
-  // 🔹 Tên phòng ban (bắt buộc)
-  @IsString()
-  name!: string;
-
-  // 🔹 Mã phòng ban (bắt buộc, duy nhất)
   @IsString()
   code!: string;
 
-  // 🔹 Đường dẫn phòng ban (bắt buộc, duy nhất)
   @IsString()
-  path!: string;
+  name!: string;
 
-  // 🔹 ID phòng ban cha (nullable)
+  // 🔹 ID của phòng ban cha
   @IsOptional()
   @IsUUID()
-  parentId?: string;
+  parent?: string | null;
 
-  // 🔹 ID trưởng phòng (nullable)
+  // 🔹 ID của trưởng phòng
   @IsOptional()
   @IsUUID()
-  managerId?: string;
+  manager?: string;
 
-  // 🔹 ID phó phòng (nullable)
+  // 🔹 ID của phó phòng
   @IsOptional()
   @IsUUID()
-  deputyId?: string;
+  deputy?: string;
 }

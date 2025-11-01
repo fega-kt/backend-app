@@ -29,7 +29,7 @@ export class DepartmentEntity extends AbstractEntity<
     nullable: true,
     onDelete: 'SET NULL',
   })
-  parent?: DepartmentEntity;
+  parent?: DepartmentEntity | null;
 
   // 🔹 Danh sách phòng ban con
   @OneToMany(() => DepartmentEntity, (department) => department.parent)
@@ -44,12 +44,12 @@ export class DepartmentEntity extends AbstractEntity<
     nullable: true,
     onDelete: 'SET NULL',
   })
-  manager?: UserEntity;
+  manager?: UserEntity | null;
 
   // 🔹 Phó phòng (1 phòng có thể có 1 phó)
   @ManyToOne('UserEntity', {
     nullable: true,
     onDelete: 'SET NULL',
   })
-  deputy?: UserEntity;
+  deputy?: UserEntity | null;
 }

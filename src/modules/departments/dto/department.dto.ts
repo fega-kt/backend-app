@@ -17,17 +17,15 @@ export class DepartmentDto extends AbstractDto {
 
   users?: UserEntity[];
 
-  parent?: DepartmentEntity;
+  parent?: DepartmentEntity | null;
 
   children?: DepartmentEntity[];
 
-  manager?: UserEntity;
+  manager?: UserEntity | null;
 
-  deputy?: UserEntity;
+  deputy?: UserEntity | null;
 
-  constructor(department: DepartmentEntity, options?: IDepartmentDtoOptions) {
-    console.info('options ::', options);
-
+  constructor(department: DepartmentEntity) {
     super(department);
     this.name = department.name;
     this.code = department.code;
