@@ -190,4 +190,17 @@ export class UserService {
 
     return user.toDto();
   }
+
+  async clearDepartmentUsers(departmentIds: Uuid[]): Promise<void> {
+    if (departmentIds.length === 0) {
+      return;
+    }
+
+    await this.userRepository
+      .createQueryBuilder()
+      .update()
+      .set({ department: null })
+      .where('department_id IN (:...departmentIds)', { departmentIds })
+      .execute();
+  }
 }

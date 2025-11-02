@@ -226,6 +226,7 @@ export class DepartmentService {
     return department;
   }
 
+  @Transactional()
   async updateDepartment(
     id: Uuid,
     updateDepartmentDto: UpdateDepartmentDto,
@@ -341,6 +342,7 @@ export class DepartmentService {
     );
   }
 
+  @Transactional()
   async deleteDepartment(id: Uuid): Promise<void> {
     const queryBuilder = this.departmentRepository
       .createQueryBuilder('departments')
@@ -352,7 +354,25 @@ export class DepartmentService {
       throw new DepartmentNotFoundException();
     }
 
-    await this.departmentRepository.remove(entity);
+    // await this.departmentRepository.update(id, { deleted: true });
+    const departments = await this.departmentRepository
+      .createQueryBuilder('d')
+      .select('d.id')
+      .where('d.path LIKE :path', { path: `%/${id}/%` })
+      .orWhere('d.path LIKE :pathEnd', { pathEnd: `%/${id}` })
+      .orWhere('d.id = :id', { id })
+      .getMany();
+
+    const ids = departments.map((d) => d.id);
+
+    await this.departmentRepository
+      .createQueryBuilder()
+      .update()
+      .set({ deleted: true })
+      .where('id IN (:...ids)', { ids })
+      .execute();
+
+    await this.userService.clearDepartmentUsers(ids);
   }
 
   async getDepartmentsForTree(): Promise<DepartmentEntity[]> {
