@@ -128,6 +128,7 @@ export default tseslint.config(
       ...tseslint.configs.recommendedTypeChecked,
     ],
     rules: {
+      'sonarjs/fixme-tag': 'off',
       'no-redeclare': 'off',
       '@typescript-eslint/no-redeclare': 'error',
       // "import/newline-after-import": "error",

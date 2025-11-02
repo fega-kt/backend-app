@@ -740,3 +740,26 @@ export function YoutubeFieldOptional(
 ) {
   return applyDecorators(YoutubeField(options), IsUndefinable());
 }
+
+export function CodeField(
+  options: Omit<ApiPropertyOptions, 'type'> & IFieldOptions = {},
+) {
+  const decorators = [
+    Expose({ groups: options.groups, name: options.name }),
+    Type(() => String),
+    ApiProperty({ type: String }),
+    MinLength(4, { message: `Code minimum length is 4` }),
+    MaxLength(10, { message: `Code maximum length is 10` }),
+    Matches(/^[A-Za-z]+$/, {
+      message: 'Only letters a–z or A–Z are allowed',
+    }),
+  ];
+
+  if (options.nullable) {
+    decorators.push(IsNullable());
+  } else {
+    decorators.push(NotEquals(null, { message: 'Code must not be null' }));
+  }
+
+  return applyDecorators(...decorators);
+}
