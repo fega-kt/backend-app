@@ -360,11 +360,51 @@ export class DepartmentService {
       .createQueryBuilder('department')
       .where('department.deleted != :deleted', { deleted: true })
       .leftJoin('department.parent', 'parent')
+      .leftJoinAndMapOne(
+        'department.manager',
+        'department.manager',
+        'manager',
+        'manager.id IS NOT NULL',
+      )
+      .leftJoinAndMapOne(
+        'department.deputy',
+        'department.deputy',
+        'deputy',
+        'deputy.id IS NOT NULL',
+      )
+
+      .addSelect([
+        'deputy.id',
+        'deputy.fullName',
+        'deputy.avatar',
+        'manager.id',
+        'manager.fullName',
+        'manager.avatar',
+      ])
       .addSelect(['parent'])
       .orderBy('department.updatedAt', 'DESC');
 
     const items = await queryBuilder.getMany();
 
-    return items;
+    const data = await Promise.all(
+      items.map(async (item) => {
+        const [managerAvatar, deputyAvatar] = await Promise.all([
+          this.awsS3Service.getPresignedUrl(item.manager?.avatar),
+          this.awsS3Service.getPresignedUrl(item.deputy?.avatar),
+        ]);
+
+        if (item.manager) {
+          item.manager.avatar = managerAvatar;
+        }
+
+        if (item.deputy) {
+          item.deputy.avatar = deputyAvatar;
+        }
+
+        return item;
+      }),
+    );
+
+    return data;
   }
 }
