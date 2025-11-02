@@ -20,7 +20,8 @@ export class TransformInterceptor<T>
         const ctx = context.switchToHttp();
         const response: { statusCode: number } = ctx.getResponse();
 
-        const status = [200, 201].includes(response.statusCode) ? 0 : 1;
+        const isOk = response.statusCode >= 200 && response.statusCode < 300;
+        const status = isOk ? 0 : 1;
 
         return {
           status,

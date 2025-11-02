@@ -46,7 +46,7 @@ export class UserEntity extends AbstractEntity<UserDto, UserDtoOptions> {
     nullable: true, // nếu user có thể chưa có phòng ban
     onDelete: 'SET NULL', // khi department bị xóa thì set NULL
   })
-  department?: DepartmentEntity;
+  department?: DepartmentEntity | null;
 
   @Column({
     type: 'boolean',
