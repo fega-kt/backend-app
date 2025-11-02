@@ -1,7 +1,8 @@
 import { IsOptional, IsString, IsUUID } from 'class-validator';
+import { CodeField } from '../../../decorators/field.decorators';
 
 export class CreateDepartmentDto {
-  @IsString()
+  @CodeField()
   code!: string;
 
   @IsString()
