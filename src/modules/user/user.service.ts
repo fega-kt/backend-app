@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass } from 'class-transformer';
-import type { FindOptionsWhere } from 'typeorm';
+import type { FindOptionsRelations, FindOptionsWhere } from 'typeorm';
 import { Repository } from 'typeorm';
 import { Transactional } from 'typeorm-transactional';
 
@@ -38,8 +38,14 @@ export class UserService {
   /**
    * Find single user
    */
-  findOne(findData: FindOptionsWhere<UserEntity>): Promise<UserEntity | null> {
-    return this.userRepository.findOneBy(findData);
+  findOne(
+    where: FindOptionsWhere<UserEntity>,
+    relations?: FindOptionsRelations<UserEntity>,
+  ): Promise<UserEntity | null> {
+    return this.userRepository.findOne({
+      where,
+      relations,
+    });
   }
 
   findByUsernameOrEmail(

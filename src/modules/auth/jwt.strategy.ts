@@ -29,11 +29,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException();
     }
 
-    const user = await this.userService.findOne({
-      // FIXME: issue with type casts
-      id: args.userId as never,
-      role: args.role,
-    });
+    const user = await this.userService.findOne(
+      {
+        // FIXME: issue with type casts
+        id: args.userId as never,
+        role: args.role,
+      },
+      { department: true },
+    );
 
     if (!user) {
       throw new UnauthorizedException();
