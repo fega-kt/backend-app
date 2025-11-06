@@ -2,11 +2,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass } from 'class-transformer';
-import type { FindOptionsRelations, FindOptionsWhere } from 'typeorm';
+import type { FindOneOptions, FindOptionsWhere } from 'typeorm';
 import { Repository } from 'typeorm';
 import { Transactional } from 'typeorm-transactional';
 
-import lodash from 'lodash';
 import type { PageDto } from '../../common/dto/page.dto.ts';
 import { FolderAWS } from '../../constants/folder.ts';
 import { FileNotImageException } from '../../exceptions/file-not-image.exception.ts';
@@ -40,11 +39,11 @@ export class UserService {
    */
   findOne(
     where: FindOptionsWhere<UserEntity>,
-    relations?: FindOptionsRelations<UserEntity>,
+    options?: Omit<FindOneOptions<UserEntity>, 'where'>,
   ): Promise<UserEntity | null> {
     return this.userRepository.findOne({
       where,
-      relations,
+      ...options,
     });
   }
 
@@ -112,25 +111,9 @@ export class UserService {
       .orderBy('user.updatedAt', 'DESC');
 
     const [items, pageMetaDto] = await queryBuilder.paginate(pageOptionsDto);
-    const data = await Promise.all(
-      items.map(async (it) => {
-        const avatar = it.avatar
-          ? await this.awsS3Service.getPresignedUrl(it.avatar)
-          : '';
-
-        it.avatar = avatar;
-        lodash.set(
-          it,
-          'fullName',
-          lodash.compact([it.firstName, it.lastName]).join(' '),
-        );
-
-        return it;
-      }),
-    );
 
     // eslint-disable-next-line sonarjs/argument-type
-    return data.toPageDto(pageMetaDto);
+    return items.toPageDto(pageMetaDto);
   }
 
   async getUser(userId: Uuid): Promise<UserDto> {

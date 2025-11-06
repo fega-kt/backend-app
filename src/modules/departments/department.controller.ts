@@ -13,6 +13,7 @@ import {
 import { RoleType } from 'constants/role-type.ts';
 import type { PageDto } from '../../common/dto/page.dto';
 import { Auth, UUIDParam } from '../../decorators/http.decorators.ts';
+import { presign } from '../../interceptors/presign.decorator.ts';
 import type { DepartmentEntity } from './department.entity.ts';
 import { DepartmentService } from './department.service.ts';
 import { CreateDepartmentDto } from './dto/create-department.dto.ts';
@@ -45,6 +46,7 @@ export class DepartmentController {
 
   @Get('tree')
   @Auth()
+  @presign()
   @HttpCode(HttpStatus.OK)
   getDepartmentsForBuildTree(): Promise<DepartmentEntity[]> {
     return this.departmentService.getDepartmentsForTree();

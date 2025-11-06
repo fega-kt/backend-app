@@ -13,6 +13,7 @@ import {
 import { ApiOkResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
 import type { IFile } from 'interfaces/IFile.ts';
 import type { Reference } from 'types.ts';
+import { presign } from '../../interceptors/presign.decorator.ts';
 
 import { PageDto } from '../../common/dto/page.dto.ts';
 import { RoleType } from '../../constants/role-type.ts';
@@ -51,6 +52,7 @@ export class UserController {
   }
 
   @Get()
+  @presign()
   @Auth([RoleType.ADMIN])
   @HttpCode(HttpStatus.OK)
   @ApiPageResponse({

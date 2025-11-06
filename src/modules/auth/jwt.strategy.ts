@@ -35,7 +35,33 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         id: args.userId as never,
         role: args.role,
       },
-      { department: true },
+      {
+        relations: {
+          department: {
+            manager: true,
+          },
+        },
+        select: {
+          id: true,
+          fullName: true,
+          role: true,
+          email: true,
+          isActive: true,
+          avatar: true,
+          firstName: true,
+          lastName: true,
+          department: {
+            id: true,
+            name: true,
+            code: true,
+            manager: {
+              id: true,
+              fullName: true,
+              avatar: true,
+            },
+          },
+        },
+      },
     );
 
     if (!user) {

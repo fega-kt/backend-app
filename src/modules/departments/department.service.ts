@@ -9,7 +9,6 @@ import { IsNull, Like, Not, type Repository } from 'typeorm';
 import { Transactional } from 'typeorm-transactional';
 
 import type { PageDto } from '../../common/dto/page.dto.ts';
-import { AwsS3Service } from '../../shared/services/aws-s3.service.ts';
 import { UserService } from '../user/user.service.ts';
 import { DepartmentEntity } from './department.entity.ts';
 import { CreateDepartmentDto } from './dto/create-department.dto.ts';
@@ -23,7 +22,6 @@ export class DepartmentService {
   constructor(
     @InjectRepository(DepartmentEntity)
     private departmentRepository: Repository<DepartmentEntity>,
-    private awsS3Service: AwsS3Service,
     @Inject(forwardRef(() => UserService))
     private userService: UserService,
   ) {}
@@ -88,17 +86,6 @@ export class DepartmentService {
         (await this.userService.findOne({ id: deputy as never })) ?? undefined;
     }
 
-    // Thực hiện tạo entity
-    // const entity = await this.commandBus.execute<
-    //   CreateDepartmentCommand,
-    //   DepartmentEntity
-    // >(
-    //   new CreateDepartmentCommand(
-    //     createDepartmentDto,
-    //     this.departmentRepository,
-    //   ),
-    // );
-
     // Tạo entity mới
     let department = this.departmentRepository.create(dataCreate);
 
@@ -148,27 +135,9 @@ export class DepartmentService {
     const [items, pageMetaDto] = await queryBuilder.paginate(
       departmentPageOptionsDto,
     );
-    const data = await Promise.all(
-      items.map(async (item) => {
-        const [managerAvatar, deputyAvatar] = await Promise.all([
-          this.awsS3Service.getPresignedUrl(item.manager?.avatar),
-          this.awsS3Service.getPresignedUrl(item.deputy?.avatar),
-        ]);
-
-        if (item.manager) {
-          item.manager.avatar = managerAvatar;
-        }
-
-        if (item.deputy) {
-          item.deputy.avatar = deputyAvatar;
-        }
-
-        return item;
-      }),
-    );
 
     // eslint-disable-next-line sonarjs/argument-type
-    return data.toPageDto(pageMetaDto);
+    return items.toPageDto(pageMetaDto);
   }
 
   async getDepartment(id: Uuid): Promise<DepartmentEntity> {
@@ -208,19 +177,6 @@ export class DepartmentService {
 
     if (!department) {
       throw new DepartmentNotFoundException();
-    }
-
-    const [managerAvatar, deputyAvatar] = await Promise.all([
-      this.awsS3Service.getPresignedUrl(department.manager?.avatar),
-      this.awsS3Service.getPresignedUrl(department.deputy?.avatar),
-    ]);
-
-    if (department.manager) {
-      department.manager.avatar = managerAvatar;
-    }
-
-    if (department.deputy) {
-      department.deputy.avatar = deputyAvatar;
     }
 
     return department;
@@ -406,25 +362,6 @@ export class DepartmentService {
 
     const items = await queryBuilder.getMany();
 
-    const data = await Promise.all(
-      items.map(async (item) => {
-        const [managerAvatar, deputyAvatar] = await Promise.all([
-          this.awsS3Service.getPresignedUrl(item.manager?.avatar),
-          this.awsS3Service.getPresignedUrl(item.deputy?.avatar),
-        ]);
-
-        if (item.manager) {
-          item.manager.avatar = managerAvatar;
-        }
-
-        if (item.deputy) {
-          item.deputy.avatar = deputyAvatar;
-        }
-
-        return item;
-      }),
-    );
-
-    return data;
+    return items;
   }
 }

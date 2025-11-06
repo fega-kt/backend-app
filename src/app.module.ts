@@ -14,6 +14,7 @@ import {
 import { DataSource } from 'typeorm';
 import { addTransactionalDataSource } from 'typeorm-transactional';
 
+import { CacheModule } from '@nestjs/cache-manager';
 import { AuthModule } from './modules/auth/auth.module.ts';
 import { DepartmentModule } from './modules/departments/department.module.ts';
 import { HealthCheckerModule } from './modules/health-checker/health-checker.module.ts';
@@ -24,6 +25,12 @@ import { SharedModule } from './shared/shared.module.ts';
 
 @Module({
   imports: [
+    CacheModule.register({
+      ttl: 120, // expire = thời gian presign url
+      max: 2000, // tối đa bao nhiêu record trong cache
+      isGlobal: true,
+    }),
+
     AuthModule,
     UserModule,
     DepartmentModule,

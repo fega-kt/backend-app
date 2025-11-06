@@ -20,6 +20,7 @@ import { RequestContextInterceptor } from 'context/request-context.interceptor.t
 import { AppModule } from './app.module.ts';
 import { HttpExceptionFilter } from './filters/bad-request.filter.ts';
 import { QueryFailedFilter } from './filters/query-failed.filter.ts';
+import { PresignInterceptor } from './interceptors/presign.interceptor.ts';
 import { TransformInterceptor } from './interceptors/transform.interceptor.service.ts';
 import { TranslationInterceptor } from './interceptors/translation-interceptor.service.ts';
 import { setupSwagger } from './setup-swagger.ts';
@@ -63,6 +64,8 @@ export async function bootstrap(): Promise<NestExpressApplication> {
     ),
   );
   app.useGlobalInterceptors(new TransformInterceptor());
+
+  app.useGlobalInterceptors(app.get(PresignInterceptor));
 
   app.useGlobalInterceptors(new RequestContextInterceptor());
 

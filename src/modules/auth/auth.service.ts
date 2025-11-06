@@ -69,7 +69,7 @@ export class AuthService {
       {
         email: userLoginDto.email,
       },
-      { department: true },
+      { relations: { department: true } },
     );
 
     const isPasswordValid = await validateHash(
