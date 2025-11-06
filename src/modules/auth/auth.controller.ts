@@ -14,6 +14,7 @@ import { RoleType } from '../../constants/role-type.ts';
 import { AuthUser } from '../../decorators/auth-user.decorator.ts';
 import { Auth } from '../../decorators/http.decorators.ts';
 import { ApiFile } from '../../decorators/swagger.schema.ts';
+import { presign } from '../../interceptors/presign.decorator.ts';
 import type { IFile } from '../../interfaces/IFile.ts';
 import type { Reference } from '../../types.ts';
 import { UserDto } from '../user/dtos/user.dto.ts';
@@ -70,12 +71,13 @@ export class AuthController {
     });
   }
 
+  @presign()
   @Get('me')
   @HttpCode(HttpStatus.OK)
   @Auth([RoleType.USER, RoleType.ADMIN])
   @ApiOkResponse({ type: UserDto, description: 'current user info' })
-  async getCurrentUser(@AuthUser() user: UserEntity): Promise<UserDto> {
-    return this.userService.getAvatarPresignedUrl(user);
+  getCurrentUser(@AuthUser() user: UserEntity): UserDto {
+    return user.toDto();
   }
 
   @Post('refresh')

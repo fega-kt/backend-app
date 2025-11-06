@@ -81,7 +81,7 @@ export class AwsS3Service {
       Key: key,
     });
 
-    const url = await getSignedUrl(this.s3, command, { expiresIn: 3600 });
+    const url = await getSignedUrl(this.s3, command, { expiresIn: 7200 });
 
     return url;
   }
