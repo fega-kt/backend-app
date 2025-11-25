@@ -749,7 +749,7 @@ export function CodeField(
     Type(() => String),
     ApiProperty({ type: String }),
     MinLength(4, { message: `Code minimum length is 4` }),
-    MaxLength(10, { message: `Code maximum length is 10` }),
+    MaxLength(30, { message: `Code maximum length is 10` }),
     Matches(/^[A-Za-z]+$/, {
       message: 'Only letters a–z or A–Z are allowed',
     }),

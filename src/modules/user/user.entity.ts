@@ -53,8 +53,4 @@ export class UserEntity extends AbstractEntity<UserDto, UserDtoOptions> {
     default: false,
   })
   isActive?: boolean;
-
-  // get fullName(): string {
-  //   return `${this.firstName} ${this.lastName}`;
-  // }
 }

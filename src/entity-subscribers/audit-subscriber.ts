@@ -7,7 +7,6 @@ import {
 } from 'typeorm';
 import { AbstractEntity } from '../common/abstract.entity.ts';
 import { generateHash } from '../common/utils.ts';
-import { SYSTEM_USER_ID } from '../constants/const.ts';
 import { RequestContext } from '../context/request-context.ts';
 import { UserEntity } from '../modules/user/user.entity.ts';
 
@@ -40,8 +39,8 @@ export class AuditSubscriber
     }
 
     // 🔹 Audit fields
-    event.entity.createdById = user?.id ?? SYSTEM_USER_ID;
-    event.entity.updatedById = user?.id ?? SYSTEM_USER_ID;
+    event.entity.createdBy = user;
+    event.entity.updatedBy = user;
   }
 
   /**
@@ -67,7 +66,7 @@ export class AuditSubscriber
 
     // 🔹 Audit fields
     if (event.entity) {
-      event.entity.updatedById = user?.id ?? SYSTEM_USER_ID;
+      event.entity.updatedBy = user ?? null;
     }
   }
 }
