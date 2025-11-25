@@ -35,21 +35,12 @@ export class DepartmentEntity extends AbstractEntity<
   @OneToMany(() => DepartmentEntity, (department) => department.parent)
   children?: DepartmentEntity[];
 
-  // 🔹 Danh sách user thuộc phòng ban này
-  @OneToMany('UserEntity', 'department')
+  @OneToMany('UserEntity', (user: UserEntity) => user.department)
   users?: UserEntity[];
 
-  // 🔹 Trưởng phòng (1 phòng có thể có 1 trưởng)
-  @ManyToOne('UserEntity', {
-    nullable: true,
-    onDelete: 'SET NULL',
-  })
+  @ManyToOne('UserEntity', { nullable: true, onDelete: 'SET NULL' })
   manager?: UserEntity | null;
 
-  // 🔹 Phó phòng (1 phòng có thể có 1 phó)
-  @ManyToOne('UserEntity', {
-    nullable: true,
-    onDelete: 'SET NULL',
-  })
+  @ManyToOne('UserEntity', { nullable: true, onDelete: 'SET NULL' })
   deputy?: UserEntity | null;
 }

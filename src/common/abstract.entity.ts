@@ -1,6 +1,7 @@
 import {
   Column,
   CreateDateColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -10,6 +11,7 @@ import type {
   AbstractDto,
   AbstractTranslationDto,
 } from './dto/abstract.dto.ts';
+import type { UserEntity } from '../modules/user/user.entity';
 
 /**
  * Abstract Entity
@@ -44,11 +46,11 @@ export abstract class AbstractEntity<
   })
   deleted?: boolean;
 
-  @Column({ type: 'uuid' })
-  createdById!: string;
+  @ManyToOne('UserEntity', { nullable: true })
+  createdBy?: UserEntity;
 
-  @Column({ type: 'uuid' })
-  updatedById!: string;
+  @ManyToOne('UserEntity', { nullable: true })
+  updatedBy?: UserEntity;
 
   translations?: AbstractTranslationEntity[];
 

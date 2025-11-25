@@ -43,20 +43,12 @@ export class PresignInterceptor implements NestInterceptor {
       return data;
     }
 
-    // ✅ Nếu là string → chỉ presign khi là key S3 hợp lệ
-
-    // if (typeof data === 'string') {
-    //   return (await this.tryPresign(data)) as T;
-    // }
-
-    // ✅ Array → xử lý từng item
+    // ✅ Array → xử lý từng item song song
     if (Array.isArray(data)) {
-      const result = await Promise.all(data.map((item) => this.process(item)));
-
-      return result as T;
+      return Promise.all(data.map((item) => this.process(item))) as Promise<T>;
     }
 
-    // ✅ Object → chỉ presign field nằm trong PRESIGN_FIELDS
+    // ✅ Object → xử lý song song tất cả field
     if (typeof data === 'object') {
       if (data instanceof Date) {
         return data;
@@ -64,25 +56,22 @@ export class PresignInterceptor implements NestInterceptor {
 
       const obj = data as Record<string, unknown>;
 
-      const entries = await Promise.all(
-        Object.entries(obj).map(async ([key, value]) => {
-          if (PRESIGN_FIELDS.has(key) && typeof value === 'string') {
-            // 🎯 Chỉ presign field nằm trong whitelist
-            const processed = await this.tryPresign(value);
+      const entries = Object.entries(obj).map(async ([key, value]) => {
+        if (PRESIGN_FIELDS.has(key) && typeof value === 'string') {
+          // presign field nằm trong whitelist
+          return [key, await this.tryPresign(value)];
+        }
 
-            return [key, processed];
-          }
+        // đệ quy các field khác
+        return [key, await this.process(value)];
+      });
 
-          // các field khác → xử lý đệ quy bình thường (nhưng không presign string)
-          const processed = await this.process(value);
+      const resolvedEntries = await Promise.all(entries);
 
-          return [key, processed];
-        }),
-      );
-
-      return Object.fromEntries(entries) as T;
+      return Object.fromEntries(resolvedEntries) as T;
     }
 
+    // các kiểu khác giữ nguyên
     return data;
   }
 
@@ -91,6 +80,7 @@ export class PresignInterceptor implements NestInterceptor {
       return value;
     }
 
+    // check cache trước
     const cached = await this.cacheManager.get<string>(value);
 
     if (cached) {
@@ -99,14 +89,14 @@ export class PresignInterceptor implements NestInterceptor {
 
     try {
       const url = await this.awsS3Service.getPresignedUrl(value);
-
+      // lưu cache 1 giờ
       await this.cacheManager.set(value, url, 3600);
 
       return url;
     } catch (error) {
-      console.error(error);
+      console.error('Presign error:', error);
 
-      return value;
+      return value; // fallback
     }
   }
 }
