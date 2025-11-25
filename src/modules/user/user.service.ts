@@ -106,7 +106,21 @@ export class UserService {
     const queryBuilder = this.userRepository
       .createQueryBuilder('user')
       .leftJoin('user.department', 'department')
-      .addSelect(['department.id', 'department.name', 'department.code'])
+      .leftJoin('department.manager', 'manager')
+      .leftJoin('department.deputy', 'deputy')
+      .addSelect([
+        'department.id',
+        'department.name',
+        'department.code',
+        'manager.id',
+        'manager.fullName',
+        'manager.email',
+        'manager.avatar',
+        'deputy.id',
+        'deputy.fullName',
+        'deputy.email',
+        'deputy.avatar',
+      ])
       .where('user.deleted != :deleted', { deleted: true })
       .orderBy('user.updatedAt', 'DESC');
 
