@@ -1,7 +1,7 @@
 import type { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class Groups1764227037839 implements MigrationInterface {
-  name = 'Groups1764227037839';
+export class Groups1764235405495 implements MigrationInterface {
+  name = 'Groups1764235405495';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
@@ -9,9 +9,9 @@ export class Groups1764227037839 implements MigrationInterface {
       "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT
       NULL DEFAULT now(), "deleted" boolean NOT NULL DEFAULT false, "name"
       character varying NOT NULL, "code" character varying NOT NULL,
-      "created_by_id" uuid, "updated_by_id" uuid, CONSTRAINT
-      "UQ_8989cafa0945a366f0c8716e609" UNIQUE ("code"), CONSTRAINT
-      "PK_659d1483316afb28afd3a90646e" PRIMARY KEY ("id"))`,
+      "permissions" text array NOT NULL DEFAULT '{}', "created_by_id" uuid,
+      "updated_by_id" uuid, CONSTRAINT "UQ_8989cafa0945a366f0c8716e609" UNIQUE
+      ("code"), CONSTRAINT "PK_659d1483316afb28afd3a90646e" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
       `CREATE TABLE "group_users" ("group_id" uuid NOT NULL, "user_id" uuid

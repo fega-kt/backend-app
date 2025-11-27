@@ -20,4 +20,19 @@ export class GroupEntity extends AbstractEntity<GroupDto, IGroupDtoOptions> {
     inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
   })
   users!: UserEntity[];
+
+  @Column('text', { array: true, default: () => "'{}'" })
+  permissions!: Permission[];
+}
+
+export enum Permission {
+  ADD_USER = 'ADD_USER',
+  UPDATE_USER = 'UPDATE_USER',
+  DELETE_USER = 'DELETE_USER',
+  ADD_GROUP = 'ADD_GROUP',
+  UPDATE_GROUP = 'UPDATE_GROUP',
+  DELETE_GROUP = 'DELETE_GROUP',
+  ADD_DEPARTMENT = 'ADD_DEPARTMENT',
+  UPDATE_DEPARTMENT = 'UPDATE_DEPARTMENT',
+  DELETE_DEPARTMENT = 'DELETE_DEPARTMENT',
 }
