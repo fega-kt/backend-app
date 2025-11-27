@@ -5,6 +5,8 @@ import { Expose, Type } from 'class-transformer';
 import {
   ArrayMaxSize,
   ArrayMinSize,
+  ArrayNotEmpty,
+  IsArray,
   IsBoolean,
   IsDate,
   IsDefined,
@@ -12,6 +14,7 @@ import {
   IsEnum,
   IsInt,
   IsNumber,
+  IsOptional,
   IsPositive,
   IsString,
   IsUUID,
@@ -759,6 +762,30 @@ export function CodeField(
     decorators.push(IsNullable());
   } else {
     decorators.push(NotEquals(null, { message: 'Code must not be null' }));
+  }
+
+  return applyDecorators(...decorators);
+}
+
+/**
+ * Decorator cho các field kiểu string array
+ */
+export function ArrayFieldString(
+  options: Omit<ApiPropertyOptions, 'type'> & IFieldOptions = {},
+) {
+  const decorators = [
+    Expose({ groups: options.groups, name: options.name }),
+    Type(() => Array),
+    ApiProperty({
+      type: [String],
+    }),
+    IsArray({ message: 'Must be an array' }),
+    ArrayNotEmpty({ message: 'Array must not be empty' }),
+    IsString({ each: true, message: 'Each element must be a string' }),
+  ];
+
+  if (options.nullable) {
+    decorators.push(IsOptional());
   }
 
   return applyDecorators(...decorators);
