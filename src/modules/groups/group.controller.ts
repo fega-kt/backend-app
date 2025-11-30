@@ -10,14 +10,15 @@ import {
   Query,
 } from '@nestjs/common';
 
+import { RoleType } from 'constants/role-type.ts';
 import type { PageDto } from '../../common/dto/page.dto';
+import { Auth, UUIDParam } from '../../decorators/http.decorators.ts';
+import { presign } from '../../interceptors/presign.decorator.ts';
 import { CreateGroupDto } from './dto/create-group.dto.ts';
-import type { GroupDto } from './dto/group.dto.ts';
 import { GroupPageOptionsDto } from './dto/group-page-options.dto.ts';
+import type { GroupDto } from './dto/group.dto.ts';
 import { UpdateGroupDto } from './dto/update-group.dto.ts';
 import { GroupService } from './group.service.ts';
-import { Auth, UUIDParam } from '../../decorators/http.decorators.ts';
-import { RoleType } from 'constants/role-type.ts';
 
 @Controller('groups')
 export class GroupController {
@@ -33,6 +34,7 @@ export class GroupController {
   }
 
   @Get()
+  @presign()
   @Auth([RoleType.ADMIN])
   @HttpCode(HttpStatus.OK)
   getGroups(
