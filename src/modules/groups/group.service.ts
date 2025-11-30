@@ -1,17 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import { Transactional } from 'typeorm-transactional';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Not, type Repository } from 'typeorm';
+import { Transactional } from 'typeorm-transactional';
 
 import type { PageDto } from '../../common/dto/page.dto.ts';
 import { CreateGroupCommand } from './commands/create-group.command.ts';
-import type { GroupDto } from './dto/group.dto.ts';
+import { CreateGroupDto } from './dto/create-group.dto.ts';
 import type { GroupPageOptionsDto } from './dto/group-page-options.dto.ts';
+import type { GroupDto } from './dto/group.dto.ts';
+import type { UpdateGroupDto } from './dto/update-group.dto.ts';
 import { GroupNotFoundException } from './exceptions/group-not-found.exception.ts';
 import { GroupEntity } from './group.entity.ts';
-import { CreateGroupDto } from './dto/create-group.dto.ts';
-import type { UpdateGroupDto } from './dto/update-group.dto.ts';
 
 @Injectable()
 export class GroupService {
@@ -34,6 +34,8 @@ export class GroupService {
     const queryBuilder = this.groupRepository
       .createQueryBuilder('groups')
       .where('groups.deleted != :deleted', { deleted: true })
+      .leftJoin('groups.users', 'users')
+      .addSelect(['users.id', 'users.fullName', 'users.email', 'users.avatar'])
       .orderBy('groups.updatedAt', 'DESC');
 
     const [items, pageMetaDto] =

@@ -1,3 +1,4 @@
+import type { UserEntity } from 'modules/user/user.entity';
 import { AbstractDto } from '../../../common/dto/abstract.dto';
 import {
   ArrayFieldString,
@@ -18,10 +19,13 @@ export class GroupDto extends AbstractDto {
   @ArrayFieldString()
   permissions: Permission[];
 
+  users: UserEntity[];
+
   constructor(group: GroupEntity) {
     super(group);
     this.name = group.name;
     this.code = group.code;
     this.permissions = group.permissions;
+    this.users = group.users;
   }
 }
