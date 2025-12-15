@@ -1,9 +1,6 @@
 
-yarn migration:generate ./src/database/migrations/abstract -> chỉnh sửa createBy và updatedBy
-yarn migration:generate ./src/database/migrations/groups -> thêm group
-yarn migration:generate ./src/database/migrations/groups-permissions -> permissions select trong enum
 
-
+yarn migration:generate ./src/database/migrations/init_neon - chuyển database sang neon để xài freee
 
 
 

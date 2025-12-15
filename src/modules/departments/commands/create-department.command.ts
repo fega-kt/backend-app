@@ -12,7 +12,6 @@ export class CreateDepartmentCommand implements ICommand {
 
   async execute(command: CreateDepartmentCommand): Promise<DepartmentEntity> {
     const { createDepartmentDto } = command;
-    console.info('jsndjvn');
     // Tạo entity
     const department = this.departmentRepository.create(
       createDepartmentDto as DepartmentEntity,

@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Not, type Repository } from 'typeorm';
 import { Transactional } from 'typeorm-transactional';
 
+import type { UserEntity } from 'modules/user/user.entity.ts';
 import type { PageDto } from '../../common/dto/page.dto.ts';
 import { CreateGroupCommand } from './commands/create-group.command.ts';
 import { CreateGroupDto } from './dto/create-group.dto.ts';
@@ -60,19 +61,40 @@ export class GroupService {
   }
 
   async updateGroup(id: Uuid, updateGroupDto: UpdateGroupDto): Promise<void> {
-    const queryBuilder = this.groupRepository
-      .createQueryBuilder('groups')
-      .where('groups.id = :id', { id });
-
-    const entity = await queryBuilder.getOne();
+    const entity = await this.groupRepository.findOne({
+      where: { id, deleted: Not(true) },
+    });
 
     if (!entity) {
       throw new GroupNotFoundException();
     }
 
-    this.groupRepository.merge(entity, updateGroupDto);
+    if (updateGroupDto.code !== entity.code) {
+      const existed = await this.groupRepository.findOne({
+        where: { code: updateGroupDto.code },
+        select: ['id'],
+      });
 
-    await this.groupRepository.save(updateGroupDto);
+      if (existed) {
+        throw new ConflictException(
+          `Group code "${updateGroupDto.code}" already exists`,
+        );
+      }
+    }
+
+    this.groupRepository.merge(entity, {
+      name: updateGroupDto.name,
+      code: updateGroupDto.code,
+      permissions: updateGroupDto.permissions ?? [],
+    });
+
+    if (updateGroupDto.users) {
+      entity.users = updateGroupDto.users.map((userId) => ({
+        id: userId,
+      })) as UserEntity[];
+    }
+
+    await this.groupRepository.save(entity);
   }
 
   @Transactional()
