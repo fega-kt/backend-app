@@ -53,6 +53,7 @@ export class GroupController {
   }
 
   @Put(':id')
+  @Auth([RoleType.ADMIN])
   @HttpCode(HttpStatus.ACCEPTED)
   updateGroup(
     @UUIDParam('id') id: Uuid,

@@ -1,11 +1,12 @@
 import { applyDecorators } from '@nestjs/common';
 import type { ApiPropertyOptions } from '@nestjs/swagger';
 import { ApiProperty } from '@nestjs/swagger';
-import { Expose, Type } from 'class-transformer';
+import { Expose, Transform, Type } from 'class-transformer';
 import {
   ArrayMaxSize,
   ArrayMinSize,
   ArrayNotEmpty,
+  ArrayUnique,
   IsArray,
   IsBoolean,
   IsDate,
@@ -771,7 +772,8 @@ export function CodeField(
  * Decorator cho các field kiểu string array
  */
 export function ArrayFieldString(
-  options: Omit<ApiPropertyOptions, 'type'> & IFieldOptions = {},
+  options: Omit<ApiPropertyOptions, 'type'> &
+    IFieldOptions & { defaultValue?: string[] } = {},
 ) {
   const decorators = [
     Expose({ groups: options.groups, name: options.name }),
@@ -780,12 +782,29 @@ export function ArrayFieldString(
       type: [String],
     }),
     IsArray({ message: 'Must be an array' }),
-    ArrayNotEmpty({ message: 'Array must not be empty' }),
+
+    ArrayUnique({ message: 'Array elements must be unique' }),
     IsString({ each: true, message: 'Each element must be a string' }),
+    // Transform(({ value }: { value?: string[] }) => value ?? []),
   ];
 
   if (options.nullable) {
     decorators.push(IsOptional());
+  } else {
+    decorators.push(ArrayNotEmpty({ message: 'Array must not be empty' }));
+  }
+
+  const { defaultValue } = options;
+
+  if (
+    defaultValue &&
+    Array.isArray(defaultValue) &&
+    defaultValue.length > 0 &&
+    defaultValue.every((item) => typeof item === 'string')
+  ) {
+    decorators.push(
+      Transform(({ value }: { value?: string[] }) => value ?? defaultValue),
+    );
   }
 
   return applyDecorators(...decorators);
