@@ -46,6 +46,7 @@ export class GroupController {
   @Get(':id')
   @Auth([RoleType.ADMIN])
   @HttpCode(HttpStatus.OK)
+  @presign()
   async getGroup(@UUIDParam('id') id: Uuid): Promise<GroupDto> {
     const entity = await this.groupService.getGroup(id);
 

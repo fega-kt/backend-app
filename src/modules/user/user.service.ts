@@ -105,6 +105,7 @@ export class UserService {
   ): Promise<PageDto<UserDto>> {
     const queryBuilder = this.userRepository
       .createQueryBuilder('user')
+      .where('user.deleted != :deleted', { deleted: true })
       .leftJoin('user.department', 'department')
       .leftJoin('department.manager', 'manager')
       .leftJoin('department.deputy', 'deputy')
