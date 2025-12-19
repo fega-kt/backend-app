@@ -1,3 +1,7 @@
+import type {
+  GroupEntity,
+  Permission,
+} from '../../../modules/groups/group.entity.ts';
 import { AbstractDto } from '../../../common/dto/abstract.dto.ts';
 import { RoleType } from '../../../constants/role-type.ts';
 import {
@@ -42,7 +46,12 @@ export class UserDto extends AbstractDto {
 
   department?: DepartmentEntity | null;
 
-  constructor(user: UserEntity, options?: UserDtoOptions) {
+  permission: Permission[];
+
+  constructor(
+    user: Omit<UserEntity, 'groups'> & { groups?: GroupEntity[] },
+    options?: UserDtoOptions,
+  ) {
     super(user);
     this.firstName = user.firstName;
     this.fullName = user.fullName;
@@ -53,5 +62,6 @@ export class UserDto extends AbstractDto {
     this.phone = user.phone;
     this.isActive = user.isActive ?? options?.isActive;
     this.department = user.department;
+    this.permission = user.groups?.flatMap((group) => group.permissions) ?? [];
   }
 }
