@@ -40,6 +40,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
           department: {
             manager: true,
           },
+          groups: true,
         },
         select: {
           id: true,
@@ -50,6 +51,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
           avatar: true,
           firstName: true,
           lastName: true,
+          groups: true,
           department: {
             id: true,
             name: true,
