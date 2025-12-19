@@ -49,7 +49,9 @@ export class GroupService {
   async getGroup(id: Uuid): Promise<GroupEntity> {
     const queryBuilder = this.groupRepository
       .createQueryBuilder('groups')
-      .where('groups.id = :id', { id });
+      .where('groups.id = :id', { id })
+      .leftJoin('groups.users', 'users')
+      .addSelect(['users.id', 'users.fullName', 'users.avatar']);
 
     const entity = await queryBuilder.getOne();
 
